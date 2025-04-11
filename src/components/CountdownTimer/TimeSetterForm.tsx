@@ -3,7 +3,6 @@
 import React, { useState, FormEvent } from 'react';
 import { Button } from '@/components/ui/Button';
 import { MAX_TIMER_DURATION } from '@/utils/constants';
-import { hoursMinutesToMs } from '@/utils/time';
 
 interface TimeSetterFormProps {
   onSetTimer: (duration: number) => void;
@@ -119,9 +118,10 @@ export const TimeSetterForm: React.FC<TimeSetterFormProps> = ({
         
         <Button
           type="submit"
-          variant="primary"
+          variant="swiss"
           size="lg"
           fullWidth
+          className="mt-8"
         >
           Start Countdown
         </Button>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'success' | 'ghost';
+type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'success' | 'ghost' | 'swiss';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 // Combine HTML button props with motion button props
@@ -36,6 +36,7 @@ export const Button: React.FC<ButtonProps> = ({
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
     success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
     ghost: 'bg-transparent hover:bg-gray-100 text-gray-700 focus:ring-gray-500',
+    swiss: 'bg-primary hover:bg-primary border-0 text-white font-swiss font-normal tracking-tight focus:ring-0 focus:ring-offset-0 uppercase',
   };
   
   const sizeClasses = {
@@ -44,17 +45,29 @@ export const Button: React.FC<ButtonProps> = ({
     lg: 'text-lg px-6 py-3',
   };
   
+  // Modify the base classes based on variant
+  const getBaseClasses = () => {
+    if (variant === 'swiss') {
+      return 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none';
+    }
+    return baseClasses;
+  };
+  
   const disabledClasses = disabled || isLoading ? 'opacity-50 cursor-not-allowed' : '';
   const widthClass = fullWidth ? 'w-full' : '';
   
-  const buttonClasses = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${disabledClasses} ${widthClass} ${className || ''}`;
+  const buttonClasses = `${getBaseClasses()} ${variantClasses[variant]} ${sizeClasses[size]} ${disabledClasses} ${widthClass} ${className || ''}`;
+  
+  // Define the motion animations based on variant
+  const motionTap = variant === 'swiss' ? { scale: 0.95 } : whileTap;
+  const motionHover = variant === 'swiss' ? { y: -2 } : whileHover;
   
   return (
     <motion.button
       className={buttonClasses}
       disabled={disabled || isLoading}
-      whileTap={whileTap}
-      whileHover={whileHover}
+      whileTap={motionTap}
+      whileHover={motionHover}
       {...rest}
     >
       {isLoading && (

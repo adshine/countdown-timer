@@ -1,26 +1,30 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ['./src/**/*.{js,ts,jsx,tsx}'],
+const config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
   theme: {
     extend: {
       colors: {
+        background: "#000000",
+        foreground: "#FFFFFF",
         primary: {
-          DEFAULT: '#6366F1',
-          dark: '#4F46E5',
-          light: '#818CF8',
-        },
-        background: {
-          DEFAULT: '#0F172A',
-          light: '#1E293B',
+          DEFAULT: "#0000FF", // Swiss design inspired blue
+          hover: "#0000D6",
         },
         accent: {
-          DEFAULT: '#22D3EE',
-          dark: '#0891B2',
-        },
+          pink: "#FF87C1", // Swiss design inspired pink
+          gold: "#FFD700", // Swiss design inspired gold
+          cream: "#FFF9E0", // Swiss design inspired cream
+        }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        mono: ["var(--font-jetbrains-mono)", "monospace"],
+        // Adding a Swiss design inspired font style
+        swiss: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -28,4 +32,6 @@ module.exports = {
     },
   },
   plugins: [],
-}; 
+};
+
+module.exports = config; 

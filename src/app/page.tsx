@@ -2,33 +2,49 @@
 
 import { motion } from 'framer-motion';
 import { CountdownTimer } from '@/components/CountdownTimer';
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="w-full flex-grow flex flex-col items-center justify-center p-6">
+    <div className="w-full min-h-screen bg-[#121212] flex flex-col items-start p-0 swiss-grid">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-3xl mx-auto"
+        className="w-full max-w-full mx-auto"
       >
-        <header className="mb-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 text-gradient">
-            Countdown Timer
+        <header className="fixed top-6 right-6 z-10">
+          <h1 className="text-3xl font-bold text-[#0000FF]">
+            DIGITAL<br/>WORKSHOP
           </h1>
-          <p className="text-lg text-gray-300">
-            Set your timer and track the countdown
+          <p className="text-sm text-right text-white">
+            {new Date().toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            }).replace(/\//g, '/')}
           </p>
         </header>
         
-        <div className="bg-background-light p-8 rounded-xl shadow-lg glass-effect">
+        <div className="w-full h-screen p-8 sm:p-12 pt-24">
           <CountdownTimer />
         </div>
         
-        <div className="mt-8 text-center text-gray-400 text-sm">
+        <div className="fixed left-8 bottom-36 text-white text-xs uppercase">
           <p>
-            This countdown timer will save your progress even if you close the browser.
+            This countdown timer will save your progress<br />even if you close the browser.
           </p>
+        </div>
+
+        <div className="hidden">
+          <Link 
+            href="/workshop" 
+            className="inline-block bg-primary hover:bg-primary-hover py-3 px-6 rounded-md transition-colors font-swiss"
+          >
+            <span className="text-[#FFF9E0] hover:text-white transition-colors text-base">
+              Digital Workshop Preview
+            </span>
+          </Link>
         </div>
       </motion.div>
     </div>

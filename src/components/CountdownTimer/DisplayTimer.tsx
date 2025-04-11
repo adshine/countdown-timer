@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/Button';
 import { formatMilliseconds } from '@/utils/time';
 
 interface DisplayTimerProps {
@@ -16,7 +15,8 @@ interface DisplayTimerProps {
 }
 
 /**
- * Component to display the current countdown time and progress
+ * Component to display the current countdown time with Swiss design principles
+ * Using 12-point grid system and top-left aligned timer
  */
 export const DisplayTimer: React.FC<DisplayTimerProps> = ({
   timeLeft,
@@ -32,127 +32,93 @@ export const DisplayTimer: React.FC<DisplayTimerProps> = ({
   
   // Split time into digits for animation
   const [hours1, hours2, , minutes1, minutes2, , seconds1, seconds2] = formattedTime.split('');
-  
-  // Animation variants for digits
-  const digitVariants = {
-    initial: { y: -20, opacity: 0 },
-    animate: { y: 0, opacity: 1 },
-    exit: { y: 20, opacity: 0 },
-  };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="timer-container p-6 mb-6">
-        <div className="relative">
-          <div className="timer-digit flex justify-center text-6xl md:text-8xl font-mono font-bold mb-8 text-center">
-            <motion.span
-              key={`h1-${hours1}`}
-              variants={digitVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.3 }}
-              className="inline-block w-14 md:w-20 text-center"
-            >
-              {hours1}
-            </motion.span>
-            <motion.span
-              key={`h2-${hours2}`}
-              variants={digitVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.3, delay: 0.05 }}
-              className="inline-block w-14 md:w-20 text-center"
-            >
-              {hours2}
-            </motion.span>
-            <span className="inline-block w-6 md:w-8 text-center opacity-50">:</span>
-            <motion.span
-              key={`m1-${minutes1}`}
-              variants={digitVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.3, delay: 0.1 }}
-              className="inline-block w-14 md:w-20 text-center"
-            >
-              {minutes1}
-            </motion.span>
-            <motion.span
-              key={`m2-${minutes2}`}
-              variants={digitVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.3, delay: 0.15 }}
-              className="inline-block w-14 md:w-20 text-center"
-            >
-              {minutes2}
-            </motion.span>
-            <span className="inline-block w-6 md:w-8 text-center opacity-50">:</span>
-            <motion.span
-              key={`s1-${seconds1}`}
-              variants={digitVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.3, delay: 0.2 }}
-              className="inline-block w-14 md:w-20 text-center"
-            >
-              {seconds1}
-            </motion.span>
-            <motion.span
-              key={`s2-${seconds2}`}
-              variants={digitVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.3, delay: 0.25 }}
-              className="inline-block w-14 md:w-20 text-center"
-            >
-              {seconds2}
-            </motion.span>
+    <div className="w-full h-full grid grid-cols-12 gap-4">
+      {/* Top left large timer */}
+      <div className="col-span-12 sm:col-span-10 md:col-span-8 flex flex-col items-start">
+        <div className="timer-container mb-8">
+          <div className="timer-digit flex text-[8rem] md:text-[12rem] font-mono font-bold text-left tracking-tight">
+            <span className="inline-block text-center text-[#0000FF]">{hours1}</span>
+            <span className="inline-block text-center text-[#0000FF]">{hours2}</span>
+            <span className="inline-block text-center text-[#0000FF] opacity-50">:</span>
+            <span className="inline-block text-center text-[#0000FF]">{minutes1}</span>
+            <span className="inline-block text-center text-[#0000FF]">{minutes2}</span>
+            <span className="inline-block text-center text-[#0000FF] opacity-50">:</span>
+            <span className="inline-block text-center text-[#0000FF]">{seconds1}</span>
+            <span className="inline-block text-center text-[#0000FF]">{seconds2}</span>
           </div>
         </div>
         
         {/* Progress bar */}
-        <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden mb-6">
+        <div className="w-full bg-[#333333] h-4 rounded-none overflow-hidden mb-12 relative">
           <motion.div 
-            className="bg-accent h-full rounded-full" 
+            className="bg-[#0000FF] h-full" 
             initial={{ width: '0%' }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.5 }}
           />
+          <div className="absolute top-0 left-0 w-full h-full grid grid-cols-12 pointer-events-none">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="border-l border-[#222222] h-full" style={{ borderLeftWidth: i === 0 ? '0' : '1px' }}></div>
+            ))}
+          </div>
         </div>
-        
-        {/* Controls */}
-        <div className="flex justify-center gap-4">
-          {isRunning && !isPaused ? (
-            <Button
-              onClick={onPause}
-              variant="secondary"
-              size="md"
+      </div>
+      
+      {/* Bottom controls with icons */}
+      <div className="col-span-12 flex justify-between items-center fixed bottom-0 left-0 right-0 p-8 bg-[#121212]">
+        <div className="grid grid-cols-12 gap-4 w-full">
+          {/* Left icon - reset */}
+          <div className="col-span-4 flex justify-start">
+            <button 
+              onClick={onReset}
+              className="w-14 h-14 rounded-full flex items-center justify-center border-2 border-[#0000FF] hover:bg-[#0000FF]/10 transition-colors"
+              aria-label="Reset timer"
             >
-              Pause
-            </Button>
-          ) : isPaused ? (
-            <Button
-              onClick={onResume}
-              variant="primary"
-              size="md"
-            >
-              Resume
-            </Button>
-          ) : null}
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0000FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+              </svg>
+            </button>
+          </div>
           
-          <Button
-            onClick={onReset}
-            variant="danger"
-            size="md"
-          >
-            Reset
-          </Button>
+          {/* Center icon - play/pause */}
+          <div className="col-span-4 flex justify-center">
+            {isRunning && !isPaused ? (
+              <button
+                onClick={onPause}
+                className="w-16 h-16 rounded-full flex items-center justify-center bg-[#0000FF] hover:bg-[#0000D6] transition-colors"
+                aria-label="Pause timer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="6" y="4" width="4" height="16"></rect>
+                  <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+              </button>
+            ) : (
+              <button
+                onClick={onResume}
+                className="w-16 h-16 rounded-full flex items-center justify-center bg-[#0000FF] hover:bg-[#0000D6] transition-colors"
+                aria-label="Resume timer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              </button>
+            )}
+          </div>
+          
+          {/* Right placeholder for symmetry */}
+          <div className="col-span-4 flex justify-end">
+            <div className="w-14 h-14 rounded-full flex items-center justify-center border-2 border-[#0000FF] hover:bg-[#0000FF]/10 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0000FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </div>
