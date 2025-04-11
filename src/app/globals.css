@@ -38,6 +38,14 @@
   }
 }
 
+/* Prevent page scrolling */
+html, body {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   background: var(--swiss-black);
   color: var(--swiss-white);
@@ -94,9 +102,16 @@ body {
 
 /* Timer specific styles */
 .timer-digit {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.05em;
+  color: #FFF;
+  text-align: center;
+  font-variant-numeric: lining-nums tabular-nums slashed-zero;
+  font-feature-settings: 'cv03' on, 'cv04' on, 'cv09' on, 'liga' off, 'clig' off;
+  font-family: Inter;
+  font-size: 160.902px;
+  font-style: normal;
+  font-weight: 200;
+  line-height: 76px; /* 94.467% */
+  letter-spacing: -10.49px;
 }
 
 /* Swiss typography */

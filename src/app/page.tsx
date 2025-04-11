@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="w-full min-h-screen bg-[#121212] flex flex-col items-start p-0 swiss-grid">
+    <div className="w-full min-h-screen bg-[#121212] flex flex-col items-start p-0">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

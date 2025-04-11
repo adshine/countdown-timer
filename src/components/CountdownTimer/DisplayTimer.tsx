@@ -1,12 +1,11 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
 import { formatMilliseconds } from '@/utils/time';
+import TextCursorProximity from '@/components/ui/text-cursor-proximity';
 
 interface DisplayTimerProps {
   timeLeft: number;
-  progress: number;
   isRunning: boolean;
   isPaused: boolean;
   onPause: () => void;
@@ -20,7 +19,6 @@ interface DisplayTimerProps {
  */
 export const DisplayTimer: React.FC<DisplayTimerProps> = ({
   timeLeft,
-  progress,
   isRunning,
   isPaused,
   onPause,
@@ -33,35 +31,119 @@ export const DisplayTimer: React.FC<DisplayTimerProps> = ({
   // Split time into digits for animation
   const [hours1, hours2, , minutes1, minutes2, , seconds1, seconds2] = formattedTime.split('');
 
+  // Container ref for mouse proximity tracking
+  const containerRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="w-full h-full grid grid-cols-12 gap-4">
       {/* Top left large timer */}
-      <div className="col-span-12 sm:col-span-10 md:col-span-8 flex flex-col items-start">
+      <div className="col-span-12 sm:col-span-10 md:col-span-8 flex flex-col items-start" ref={containerRef}>
         <div className="timer-container mb-8">
-          <div className="timer-digit flex text-[8rem] md:text-[12rem] font-mono font-bold text-left tracking-tight">
-            <span className="inline-block text-center text-[#0000FF]">{hours1}</span>
-            <span className="inline-block text-center text-[#0000FF]">{hours2}</span>
-            <span className="inline-block text-center text-[#0000FF] opacity-50">:</span>
-            <span className="inline-block text-center text-[#0000FF]">{minutes1}</span>
-            <span className="inline-block text-center text-[#0000FF]">{minutes2}</span>
-            <span className="inline-block text-center text-[#0000FF] opacity-50">:</span>
-            <span className="inline-block text-center text-[#0000FF]">{seconds1}</span>
-            <span className="inline-block text-center text-[#0000FF]">{seconds2}</span>
-          </div>
-        </div>
-        
-        {/* Progress bar */}
-        <div className="w-full bg-[#333333] h-4 rounded-none overflow-hidden mb-12 relative">
-          <motion.div 
-            className="bg-[#0000FF] h-full" 
-            initial={{ width: '0%' }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5 }}
-          />
-          <div className="absolute top-0 left-0 w-full h-full grid grid-cols-12 pointer-events-none">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="border-l border-[#222222] h-full" style={{ borderLeftWidth: i === 0 ? '0' : '1px' }}></div>
-            ))}
+          <div className="timer-digit flex text-[12rem] md:text-[16rem] font-mono font-bold text-left tracking-tight">
+            <TextCursorProximity
+              label={hours1}
+              containerRef={containerRef}
+              className="inline-block text-center"
+              styles={{
+                transform: {
+                  from: "scale(1)",
+                  to: "scale(1.1)",
+                },
+                color: { 
+                  from: "#FFFFFF", 
+                  to: "#0000FF"
+                },
+              }}
+              falloff="gaussian"
+              radius={100}
+            />
+            <TextCursorProximity
+              label={hours2}
+              containerRef={containerRef}
+              className="inline-block text-center"
+              styles={{
+                transform: {
+                  from: "scale(1)",
+                  to: "scale(1.1)",
+                },
+                color: { 
+                  from: "#FFFFFF", 
+                  to: "#0000FF"
+                },
+              }}
+              falloff="gaussian"
+              radius={100}
+            />
+            <span className="inline-block text-center opacity-50">:</span>
+            <TextCursorProximity
+              label={minutes1}
+              containerRef={containerRef}
+              className="inline-block text-center"
+              styles={{
+                transform: {
+                  from: "scale(1)",
+                  to: "scale(1.1)",
+                },
+                color: { 
+                  from: "#FFFFFF", 
+                  to: "#0000FF"
+                },
+              }}
+              falloff="gaussian"
+              radius={100}
+            />
+            <TextCursorProximity
+              label={minutes2}
+              containerRef={containerRef}
+              className="inline-block text-center"
+              styles={{
+                transform: {
+                  from: "scale(1)",
+                  to: "scale(1.1)",
+                },
+                color: { 
+                  from: "#FFFFFF", 
+                  to: "#0000FF"
+                },
+              }}
+              falloff="gaussian"
+              radius={100}
+            />
+            <span className="inline-block text-center opacity-50">:</span>
+            <TextCursorProximity
+              label={seconds1}
+              containerRef={containerRef}
+              className="inline-block text-center"
+              styles={{
+                transform: {
+                  from: "scale(1)",
+                  to: "scale(1.1)",
+                },
+                color: { 
+                  from: "#FFFFFF", 
+                  to: "#0000FF"
+                },
+              }}
+              falloff="gaussian"
+              radius={100}
+            />
+            <TextCursorProximity
+              label={seconds2}
+              containerRef={containerRef}
+              className="inline-block text-center"
+              styles={{
+                transform: {
+                  from: "scale(1)",
+                  to: "scale(1.1)",
+                },
+                color: { 
+                  from: "#FFFFFF", 
+                  to: "#0000FF"
+                },
+              }}
+              falloff="gaussian"
+              radius={100}
+            />
           </div>
         </div>
       </div>
@@ -123,4 +205,4 @@ export const DisplayTimer: React.FC<DisplayTimerProps> = ({
       </div>
     </div>
   );
-}; 
+};

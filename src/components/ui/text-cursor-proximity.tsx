@@ -41,6 +41,7 @@ const TextCursorProximity = forwardRef<HTMLSpanElement, TextProps>(
     const letterRefs = useRef<(HTMLSpanElement | null)[]>([])
     const mousePositionRef = useMousePositionRef(containerRef)
     const [letterProximities, setLetterProximities] = useState<number[]>([])
+    const animationFrameIdRef = useRef<number>(0)
     
     // Initialize letter proximities
     useEffect(() => {
@@ -71,15 +72,16 @@ const TextCursorProximity = forwardRef<HTMLSpanElement, TextProps>(
       }
     }
 
-    // Update proximities on mouse move
+    // Update proximities on animation frame
     useEffect(() => {
-      if (letterRefs.current.length === 0 || !containerRef.current) return
-        
+      if (!containerRef.current) return
+      
       const updateProximities = () => {
         if (!containerRef.current) return
         const containerRect = containerRef.current.getBoundingClientRect()
         
         const newProximities = [...letterProximities]
+        let hasChanged = false
         
         letterRefs.current.forEach((letterRef, index) => {
           if (!letterRef) return
@@ -96,59 +98,54 @@ const TextCursorProximity = forwardRef<HTMLSpanElement, TextProps>(
           )
           
           const proximity = calculateFalloff(distance)
-          newProximities[index] = proximity
+          
+          // Only update if there's a meaningful change
+          if (Math.abs(newProximities[index] - proximity) > 0.01) {
+            newProximities[index] = proximity
+            hasChanged = true
+          }
         })
         
-        setLetterProximities(newProximities)
+        // Only trigger re-render if proximities actually changed
+        if (hasChanged) {
+          setLetterProximities(newProximities)
+        }
       }
       
-      const animationFrame = requestAnimationFrame(function animate() {
+      const animate = () => {
         updateProximities()
-        requestAnimationFrame(animate)
-      })
+        animationFrameIdRef.current = requestAnimationFrame(animate)
+      }
+      
+      animationFrameIdRef.current = requestAnimationFrame(animate)
       
       return () => {
-        cancelAnimationFrame(animationFrame)
+        cancelAnimationFrame(animationFrameIdRef.current)
       }
-    }, [containerRef, mousePositionRef, letterProximities, radius, falloff])
+    }, [containerRef, letterProximities, radius, falloff])
 
     const words = label.split(" ")
     let letterIndex = 0
 
-    // Improved interpolation for colors and other values
-    const getStylesForLetter = (proximity: number): Record<string, string | number> => {
-      const result: Record<string, string | number> = {}
+    // Helper to interpolate styles based on proximity
+    const interpolateStyle = (
+      key: string, 
+      from: string | number, 
+      to: string | number, 
+      proximity: number
+    ): string | number => {
+      // Handle numeric values
+      if (typeof from === "number" && typeof to === "number") {
+        return from + (to - from) * proximity
+      }
       
-      Object.entries(styles).forEach(([key, value]) => {
-        // Skip if value is undefined
-        if (!value || value.from === undefined || value.to === undefined) return;
-        
-        const fromValue = value.from;
-        const toValue = value.to;
-        
-        if (typeof fromValue === 'number' && typeof toValue === 'number') {
-          // Linear interpolation for numeric values
-          result[key] = fromValue + (toValue - fromValue) * proximity
-        } else if (
-          typeof fromValue === 'string' && typeof toValue === 'string' && 
-          fromValue.startsWith('#') && toValue.startsWith('#')
-        ) {
-          // Color interpolation for hex colors
-          if (proximity <= 0) {
-            result[key] = fromValue
-          } else if (proximity >= 1) {
-            result[key] = toValue
-          } else {
-            // Simple color implementation - just switch at 50%
-            result[key] = proximity > 0.5 ? toValue : fromValue
-          }
-        } else {
-          // Default handling for other types - ensure they're both strings or numbers
-          result[key] = proximity > 0.5 ? toValue : fromValue
-        }
-      })
+      // Handle color values (simple implementation)
+      if (typeof from === "string" && typeof to === "string") {
+        // Simple approach - just switch at 50% proximity
+        return proximity > 0.5 ? to : from
+      }
       
-      return result
+      return from // Default fallback
     }
 
     return (
@@ -162,11 +159,24 @@ const TextCursorProximity = forwardRef<HTMLSpanElement, TextProps>(
           <span key={wordIndex} className="inline-block whitespace-nowrap">
             {word.split("").map((letter) => {
               const currentLetterIndex = letterIndex++
-              const letterStyle = 
-                currentLetterIndex < letterProximities.length
-                ? getStylesForLetter(letterProximities[currentLetterIndex])
-                : getStylesForLetter(0) // Default to 0 proximity if not initialized yet
+              const proximity = letterProximities[currentLetterIndex] || 0
               
+              // Create interpolated styles for this letter
+              const letterStyles: Record<string, string | number> = {}
+              
+              Object.entries(styles).forEach(([key, value]) => {
+                if (value && 
+                   'from' in value && 
+                   'to' in value && 
+                   value.from !== undefined && 
+                   value.to !== undefined) {
+                  // Now we're sure from and to are defined string or number values
+                  const fromValue = value.from as string | number;
+                  const toValue = value.to as string | number;
+                  letterStyles[key] = interpolateStyle(key, fromValue, toValue, proximity);
+                }
+              })
+
               return (
                 <motion.span
                   key={currentLetterIndex}
@@ -175,7 +185,7 @@ const TextCursorProximity = forwardRef<HTMLSpanElement, TextProps>(
                   }}
                   className="inline-block"
                   aria-hidden="true"
-                  style={letterStyle}
+                  style={letterStyles}
                 >
                   {letter}
                 </motion.span>
