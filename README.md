@@ -1,24 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Countdown Timer
+
+A futuristic countdown timer web application that allows users to set and track a 24-hour countdown with delightful celebrations upon completion.
+
+## Features
+
+- Single countdown timer with persistence
+- Futuristic UI design with animations
+- Full-screen celebration effects
+- Sound notifications
+- Social sharing capabilities
+- Responsive design
+
+## Tech Stack
+
+- Framework: Next.js 14 with TypeScript
+- Styling: Tailwind CSS
+- State Management: Zustand
+- Animations: Framer Motion
+- Effects: Canvas Confetti
+- Audio: use-sound
+- Date Handling: date-fns
+- Social: react-share
 
 ## Getting Started
 
-First, run the development server:
+First, install the dependencies:
+
+```bash
+npm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── layout.tsx        # Root layout with metadata
+│   ├── page.tsx          # Main page component
+│   └── globals.css       # Global styles
+├── components/
+│   ├── CountdownTimer/
+│   │   ├── index.tsx           # Main timer component
+│   │   ├── DisplayTimer.tsx    # Timer display
+│   │   └── TimeSetterForm.tsx  # Time input form
+│   ├── Celebrations/
+│   │   ├── Confetti.tsx       # Confetti effect
+│   │   └── CelebrationModal.tsx # Completion modal
+│   └── ui/
+│       ├── Button.tsx         # Reusable button
+│       └── Input.tsx          # Reusable input
+├── hooks/
+│   ├── useCountdown.ts    # Timer logic
+│   ├── useSound.ts        # Sound effects
+│   └── useLocalStorage.ts # Persistence
+├── store/
+│   └── timerStore.ts      # Global state
+└── utils/
+    ├── time.ts           # Time calculations
+    └── constants.ts      # App constants
+```
 
 ## Learn More
 
