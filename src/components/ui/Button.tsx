@@ -77,9 +77,9 @@ export const Button: React.FC<ButtonProps> = ({
         </svg>
       )}
       
-      {!isLoading && leftIcon && <span className="mr-2">{leftIcon}</span>}
-      <span>{children}</span>
-      {!isLoading && rightIcon && <span className="ml-2">{rightIcon}</span>}
+      {!isLoading && leftIcon && <span className="mr-2">{leftIcon as React.ReactNode}</span>}
+      <span>{children as React.ReactNode}</span>
+      {!isLoading && rightIcon && <span className="ml-2">{rightIcon as React.ReactNode}</span>}
     </motion.button>
   );
 }; 

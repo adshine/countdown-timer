@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { TimeSetterForm } from './TimeSetterForm';
+import { KnobTimeSetter } from './KnobTimeSetter';
 import { DisplayTimer } from './DisplayTimer';
 import { CelebrationModal } from '@/components/Celebrations/CelebrationModal';
 import { useCountdown } from '@/hooks/useCountdown';
@@ -34,7 +34,6 @@ export const CountdownTimer: React.FC = () => {
   // Set up countdown hook
   const { 
     timeLeft, 
-    progress, 
     isRunning, 
     isPaused,
     start, 
@@ -93,14 +92,13 @@ export const CountdownTimer: React.FC = () => {
       {/* Timer interface */}
       <div className="w-full">
         {!isRunning && !isPaused ? (
-          <TimeSetterForm 
+          <KnobTimeSetter 
             onSetTimer={handleSetTimer} 
             onStart={handleStart} 
           />
         ) : (
           <DisplayTimer 
             timeLeft={timeLeft}
-            progress={progress}
             isRunning={isRunning}
             isPaused={isPaused}
             onPause={handlePause}

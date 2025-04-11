@@ -1,55 +1,119 @@
-import { useState, useCallback, useEffect } from 'react';
-import useSound from 'use-sound';
+'use client';
 
-interface UseSoundOptions {
-  soundEnabled?: boolean;
+import { useRef, useEffect, useState, useCallback } from 'react';
+import { Howl } from 'howler';
+
+type SoundOptions = {
   volume?: number;
-  playbackRate?: number;
-  interrupt?: boolean;
-  sprite?: Record<string, [number, number]>;
-  onend?: () => void;
-}
+  loop?: boolean;
+  autoplay?: boolean;
+};
 
 /**
- * Custom wrapper around use-sound library
- * Adds ability to disable sounds globally and handles server-side rendering
+ * Custom hook for playing sound effects
  */
-export const useSoundEffect = (
-  url: string,
-  options: UseSoundOptions = {}
-) => {
-  const [isClient, setIsClient] = useState(false);
-  const { soundEnabled = true, ...restOptions } = options;
-
-  // Handle SSR
+export function useSoundEffect(src: string, options: SoundOptions = {}) {
+  const soundRef = useRef<Howl | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  // Initialize sound on mount with lazy loading
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Only try to load sounds on client side
-  const [play, { sound, stop, pause, duration }] = useSound(
-    url,
-    {
-      ...restOptions,
-      soundEnabled: isClient && soundEnabled,
-    }
-  );
-
-  // Safe play function that works on client side only
-  const safePlay = useCallback(
-    (options?: Record<string, unknown>) => {
-      if (isClient && soundEnabled) {
-        play(options);
+    // Create sound instance
+    const sound = new Howl({
+      src: [src],
+      volume: options.volume ?? 1,
+      loop: options.loop ?? false,
+      autoplay: false, // Never autoplay - requires user interaction first
+      preload: true,
+      html5: true, // Use HTML5 Audio API to avoid AudioContext issues
+      onload: () => {
+        setIsReady(true);
+      },
+      onplay: () => {
+        setIsPlaying(true);
+      },
+      onend: () => {
+        setIsPlaying(false);
+      },
+      onstop: () => {
+        setIsPlaying(false);
+      },
+      onpause: () => {
+        setIsPlaying(false);
       }
-    },
-    [isClient, soundEnabled, play]
-  );
-
+    });
+    
+    soundRef.current = sound;
+    
+    // Clean up on unmount
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.stop();
+        soundRef.current.unload();
+        soundRef.current = null;
+      }
+    };
+  }, [src, options.volume, options.loop]);
+  
+  // Play sound only after user interaction
+  const play = useCallback(() => {
+    if (!soundRef.current || !isReady) return;
+    
+    try {
+      // Check if Howler's AudioContext needs to be resumed
+      if (Howler.ctx && Howler.ctx.state !== 'running') {
+        Howler.ctx.resume().then(() => {
+          soundRef.current?.play();
+        }).catch(err => {
+          console.error('Failed to resume audio context:', err);
+        });
+      } else {
+        soundRef.current.play();
+      }
+    } catch (error) {
+      console.error('Error playing sound:', error);
+    }
+  }, [isReady]);
+  
+  // Stop sound
+  const stop = useCallback(() => {
+    if (!soundRef.current || !isReady) return;
+    soundRef.current.stop();
+  }, [isReady]);
+  
+  // Pause sound
+  const pause = useCallback(() => {
+    if (!soundRef.current || !isReady) return;
+    soundRef.current.pause();
+  }, [isReady]);
+  
+  // Resume sound
+  const resume = useCallback(() => {
+    if (!soundRef.current || !isReady) return;
+    
+    try {
+      // Check if Howler's AudioContext needs to be resumed
+      if (Howler.ctx && Howler.ctx.state !== 'running') {
+        Howler.ctx.resume().then(() => {
+          soundRef.current?.play();
+        }).catch(err => {
+          console.error('Failed to resume audio context:', err);
+        });
+      } else {
+        soundRef.current.play();
+      }
+    } catch (error) {
+      console.error('Error resuming sound:', error);
+    }
+  }, [isReady]);
+  
   return {
-    play: safePlay,
-    sound,
+    play,
     stop,
     pause,
-    duration,
+    resume,
+    isPlaying,
+    isReady
   };
-}; 
+} 
